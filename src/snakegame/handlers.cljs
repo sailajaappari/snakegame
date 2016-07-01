@@ -12,7 +12,7 @@
                     :snake snake
                     :point (rand-free-position snake board)
                     :points 0
-                    :game-running? true})
+                    :game-running? false})
 
 (register-handler                  
  :initialize                       
@@ -25,4 +25,24 @@
   (fn
     [db _]
     (reaction (:board @db))))  
+
+(register-sub
+  :snake
+  (fn [db _]
+    (reaction (:body (:snake @db)))))
+
+(register-sub
+  :point
+  (fn [db _]
+    (reaction (:point @db))))
+
+(register-sub
+  :points
+  (fn [db _]
+    (reaction (:points @db))))
+
+(register-sub
+  :game-running?
+  (fn [db _]
+    (reaction (:game-running? @db))))
 
