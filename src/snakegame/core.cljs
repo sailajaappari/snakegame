@@ -8,6 +8,11 @@
 
 (enable-console-print!)
 
+;;dispatch the next state event every 150ms
+
+(defonce snake-moving
+   (js/setInterval #(dispatch [:next-state]) 150))
+
 (defn game []
   [:div
    [render-board]

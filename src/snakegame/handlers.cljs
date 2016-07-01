@@ -1,7 +1,8 @@
 (ns snakegame.handlers
   (:require-macros [reagent.ratom :refer [reaction]])
-  (:require [snakegame.functions :refer [rand-free-position]]
-            [re-frame.core :refer [register-handler register-sub subscribe dispatch dispatch-sync]]))
+  (:require [snakegame.functions :refer [rand-free-position move-snake change-snake-direction key-code->move]]
+            [re-frame.core :refer [register-handler register-sub subscribe dispatch dispatch-sync]]
+            [goog.events :as events]))
 
 (def board [35 25])
 
@@ -12,14 +13,35 @@
                     :snake snake
                     :point (rand-free-position snake board)
                     :points 0
-                    :game-running? false})
-
+                    :game-running? true})
+;; Handlers
 (register-handler                  
  :initialize                       
  (fn
    [db _]                         
    (merge db initial-state)))    
 
+(register-handler
+  :next-state
+  (fn [db _]
+    (if (:game-running? db)
+       (update db :snake move-snake)
+       db)))
+
+(register-handler
+  :change-direction
+  (fn [db [_ new-direction]]
+    (update-in db [:snake :direction] 
+              (partial change-snake-direction new-direction))))
+
+(defonce key-handler
+  (events/listen js/window "keydown"
+                 (fn [e]
+                   (let [key-code (.-keyCode e)]
+                      (when (contains? key-code->move key-code)
+                         (dispatch [:change-direction (key-code->move key-code)]))))))
+
+;; Subscribers
 (register-sub
   :board
   (fn
