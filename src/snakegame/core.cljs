@@ -11,7 +11,7 @@
 ;;dispatch the next state event every 150ms
 
 (defonce snake-moving
-   (js/setInterval #(dispatch [:next-state]) 150))
+   (js/setInterval #(dispatch [:next-state]) 300))
 
 (defn game []
   [:div

@@ -29,3 +29,40 @@
   (if (or (= x new-x) (= y new-y))
     [x y]
     [new-x new-y]))
+
+(defn snake-tail [coordinate-1 coordinate-2]
+  (if (= coordinate-1 coordinate-2)
+    coordinate-1
+    (if (> coordinate-1 coordinate-2)
+      (dec coordinate-2)
+      (inc coordinate-2))))
+
+(defn grow-snake
+  "Append a new tail body segment to the snake"
+  [{:keys [body direction] :as snake}]
+  (let [[[first-x first-y] [second-x second-y]] (take-last 2 body)
+        x (snake-tail first-x second-x)
+        y (snake-tail first-y second-y)]
+     (update-in snake [:body] #(conj % [x y]))))
+
+(defn process-move
+  [{:keys [snake point board] :as db}]
+  (if (= point (first (:body snake)))
+    (-> db
+        (update-in [:snake] grow-snake)
+        (update-in [:points] inc)
+        (assoc :point (rand-free-position snake board)))
+    db))
+
+
+(defn collisions
+  [snake board]
+  (let [{:keys [body direction]} snake
+        [x y] board
+        boarder-x #{x -1}
+        boarder-y #{y -1}
+        future-x (+ (first direction) (ffirst body))
+        future-y (+ (second diretcion) (second (first body)))]
+     (or (contains? boarder-x future-x)
+         (contains? boarder-y future-y)
+         (contains? (into #{} (rest body)) [future-x future-y]))))

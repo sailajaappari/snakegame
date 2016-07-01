@@ -1,5 +1,5 @@
 (ns snakegame.view
-  (:require [re-frame.core :refer [subscribe]]))
+  (:require [re-frame.core :refer [subscribe dispatch]]))
 
 (defn render-board
   "renders game board area"
@@ -38,5 +38,5 @@
       (if @game-state
         [:div]
         [:div.overlay
-         [:div.play
+         [:div.play {:on-click #(dispatch [:initialize])}
           [:h2 "refresh"]]]))))
